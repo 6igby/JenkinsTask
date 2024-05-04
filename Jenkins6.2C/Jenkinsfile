@@ -58,7 +58,7 @@ pipeline {
             }
         }
         
-        stage('Deploy to Production') {
+        stage('Deploy Production') {
             steps {
                 script {
                     // Deploy application to production server (e.g., AWS EC2) using AWS CLI
