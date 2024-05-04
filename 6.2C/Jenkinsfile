@@ -1,0 +1,89 @@
+pipeline {
+    agent any
+    
+    stages {
+        stage('Build') {
+            steps {
+                script {
+                    // Build the code using Maven
+                    sh 'mvn clean package'
+                }
+            }
+        }
+        
+        stage('Unit and Integration Tests') {
+            steps {
+                script {
+                    // Run unit tests
+                    sh 'mvn test'
+                    // Run integration tests
+                    sh 'mvn integration-test'
+                }
+            }
+        }
+        
+        stage('Code Analysis') {
+            steps {
+                script {
+                    // Integrate code analysis tool (e.g., SonarQube)
+                    sh 'sonar-scanner'
+                }
+            }
+        }
+        
+        stage('Security Scan') {
+            steps {
+                script {
+                    // Perform security scan using a tool (e.g., OWASP Dependency-Check)
+                    sh 'owasp-dependency-check'
+                }
+            }
+        }
+        
+        stage('Deploy to Staging') {
+            steps {
+                script {
+                    // Deploy application to staging server (e.g., AWS EC2) using AWS CLI
+                    sh 'aws deploy staging'
+                }
+            }
+        }
+        
+        stage('Integration Tests on Staging') {
+            steps {
+                script {
+                    // Run integration tests on staging environment using Selenium
+                    sh 'selenium-test-runner --env staging'
+                }
+            }
+        }
+        
+        stage('Deploy to Production') {
+            steps {
+                script {
+                    // Deploy application to production server (e.g., AWS EC2) using AWS CLI
+                    sh 'aws deploy production'
+                }
+            }
+        }
+    }
+    
+    post {
+        success {
+            emailext (
+                subject: "Pipeline Success",
+                body: "Pipeline executed successfully.",
+                to: "your-email@example.com",
+                attachLog: true
+            )
+        }
+        failure {
+            emailext (
+                subject: "Pipeline Failure",
+                body: "Pipeline execution failed. Please check logs for details.",
+                to: "your-email@example.com",
+                attachLog: true
+            )
+        }
+    }
+}
